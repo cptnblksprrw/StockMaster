@@ -1,42 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory</title>
-    <link rel="stylesheet" href="/styles/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/styles/styles.css" />
+  </head>
+  <body>
     <header>
-        <h1>Warehouse Inventory</h1>
+      <h1>Warehouse Inventory</h1>
     </header>
-    <main>
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <nav>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="#" id="openAddModal">Add Inventory</a></li>
+            <li><a href="#" id="openScanModal">Scan Item</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
         <h2>Item List</h2>
         <table>
-            <thead>
-                <tr>
-                    <th>Item Name</th>
-                    <th>Quantity</th>
-                    <th>Barcode</th>
-                    <th>Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% items.forEach(item => { %>
-                    <tr>
-                        <td><%= item.name %></td>
-                        <td><%= item.quantity %></td>
-                        <td><%= item.barcode %></td>
-                        <td><a href="/item/<%= item._id %>">View Details</a></td>
-                    </tr>
-                <% }) %>
-            </tbody>
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>Barcode</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% items.forEach(item => { %>
+            <tr>
+              <td><%= item.name %></td>
+              <td><%= item.quantity %></td>
+              <td><%= item.barcode %></td>
+              <td><a href="/item/<%= item._id %>">View Details</a></td>
+            </tr>
+            <% }) %>
+          </tbody>
         </table>
-        <button id="openAddModal" class="button">Add New Item</button>
-        <button id="openScanModal" class="button">Scan Item</button>
-    </main>
+      </main>
+    </div>
 
-    <!-- Add Inventory Modal -->
+    <!-- Add Inventory and Scan Item Modals -->
     <div id="addModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeAddModal">&times;</span>
@@ -59,7 +72,6 @@
         </div>
     </div>
 
-    <!-- Scan Item Modal -->
     <div id="scanModal" class="modal">
         <div class="modal-content">
             <span class="close" id="closeScanModal">&times;</span>
@@ -78,40 +90,42 @@
     </div>
 
     <script>
-        // Add Inventory Modal Controls
-        const addModal = document.getElementById('addModal');
-        const openAddModal = document.getElementById('openAddModal');
-        const closeAddModal = document.getElementById('closeAddModal');
+      // Add Inventory Modal
+      const addModal = document.getElementById("addModal");
+      const openAddModal = document.getElementById("openAddModal");
+      const closeAddModal = document.getElementById("closeAddModal");
 
-        openAddModal.addEventListener('click', () => {
-            addModal.style.display = 'block';
-        });
+      openAddModal.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent navigation
+        addModal.style.display = "block";
+      });
 
-        closeAddModal.addEventListener('click', () => {
-            addModal.style.display = 'none';
-        });
+      closeAddModal.addEventListener("click", () => {
+        addModal.style.display = "none";
+      });
 
-        // Scan Item Modal Controls
-        const scanModal = document.getElementById('scanModal');
-        const openScanModal = document.getElementById('openScanModal');
-        const closeScanModal = document.getElementById('closeScanModal');
+      // Scan Item Modal
+      const scanModal = document.getElementById("scanModal");
+      const openScanModal = document.getElementById("openScanModal");
+      const closeScanModal = document.getElementById("closeScanModal");
 
-        openScanModal.addEventListener('click', () => {
-            scanModal.style.display = 'block';
-        });
+      openScanModal.addEventListener("click", (event) => {
+        event.preventDefault(); // Prevent navigation
+        scanModal.style.display = "block";
+      });
 
-        closeScanModal.addEventListener('click', () => {
-            scanModal.style.display = 'none';
-        });
+      closeScanModal.addEventListener("click", () => {
+        scanModal.style.display = "none";
+      });
 
-        // Close modals if user clicks outside of them
-        window.addEventListener('click', (event) => {
-            if (event.target === addModal) {
-                addModal.style.display = 'none';
-            } else if (event.target === scanModal) {
-                scanModal.style.display = 'none';
-            }
-        });
+      // Close modals if user clicks outside them
+      window.addEventListener("click", (event) => {
+        if (event.target === addModal) {
+          addModal.style.display = "none";
+        } else if (event.target === scanModal) {
+          scanModal.style.display = "none";
+        }
+      });
     </script>
-</body>
+  </body>
 </html>
