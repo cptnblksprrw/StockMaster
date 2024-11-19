@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Item Details</h1>
+    </header>
+    <main>
+        <h2><%= item.name %></h2>
+        <p><strong>Quantity:</strong> <%= item.quantity %></p>
+        <p><strong>Category:</strong> <%= item.category %></p>
+        <p><strong>Description:</strong> <%= item.description %></p>
+        <p><strong>Barcode:</strong> <%= item.barcode %></p>
+        <a href="/" class="button">Back to Inventory</a>
+    </main>
+</body>
+</html>

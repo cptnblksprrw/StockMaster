@@ -1,11 +1,10 @@
-// basic template - will remove later
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Inventory</title>
-    <link rel="stylesheet" href="public/styles/styles.css">
+    <link rel="stylesheet" href="/styles/styles.css">
 </head>
 <body>
     <header>
@@ -13,8 +12,8 @@
     </header>
     <main>
         <form action="/add-item" method="POST">
-            <label for="itemName">Item Name:</label>
-            <input type="text" id="itemName" name="itemName" required>
+            <label for="name">Item Name:</label>
+            <input type="text" id="name" name="name" required>
             
             <label for="quantity">Quantity:</label>
             <input type="number" id="quantity" name="quantity" required>
@@ -27,7 +26,7 @@
             
             <button type="submit">Add Item</button>
         </form>
-        <a href="inventory.html" class="button">Back to Inventory</a>
+        <a href="/" class="button">Back to Inventory</a>
     </main>
 </body>
 </html>

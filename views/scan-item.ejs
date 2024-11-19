@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan Item</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Scan Item</h1>
+    </header>
+    <main>
+        <form id="scanForm" action="/scan-item" method="POST">
+            <label for="barcode">Scan Barcode:</label>
+            <input 
+                type="text" 
+                id="barcode" 
+                name="barcode" 
+                placeholder="Scan barcode here" 
+                required 
+                autofocus>
+        </form>
+        <div id="itemDetails">
+            <% if (error) { %>
+                <p style="color: red;"><%= error %></p>
+            <% } else if (item) { %>
+                <h2>Item Details</h2>
+                <p><strong>Name:</strong> <%= item.name %></p>
+                <p><strong>Quantity:</strong> <%= item.quantity %></p>
+                <p><strong>Category:</strong> <%= item.category %></p>
+                <p><strong>Description:</strong> <%= item.description %></p>
+                <p><strong>Barcode:</strong> <%= item.barcode %></p>
+            <% } %>
+        </div>
+    </main>
+    <script>
+        const form = document.getElementById('scanForm');
