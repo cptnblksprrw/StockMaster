@@ -80,31 +80,27 @@ form button:hover {
 }
 
 /* Modal container (hidden by default) */
+/* Modal styles */
 .modal {
     display: none; /* Hidden by default */
-    position: fixed; 
-    z-index: 1; 
+    position: fixed;
+    z-index: 1; /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scrolling if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
-/* Modal content box */
 .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto; /* 15% from top and centered */
+    background-color: #fff;
+    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* 80% of the window */
-    max-width: 500px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%; /* Adjust width as needed */
 }
 
-/* Close button */
 .close {
     color: #aaa;
     float: right;
@@ -112,11 +108,13 @@ form button:hover {
     font-weight: bold;
 }
 
-.close:hover, .close:focus {
+.close:hover,
+.close:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;
 }
+
 
 /* Page layout */
 .container {
@@ -157,4 +155,30 @@ form button:hover {
 .main-content {
     flex: 1;
     padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+.inventory-section {
+    margin-top: 20px;
+}
+
+/* Action button styling */
+#applyAction {
+    padding: 10px 20px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#applyAction:hover {
+    background-color: #c9302c;
+}
+
+select, button {
+    margin: 10px;
+    padding: 5px;
 }

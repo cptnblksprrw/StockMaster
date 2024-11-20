@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Group</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Create New Group</h1>
+    </header>
+
+    <div class="container">
+        <form action="/create-group" method="POST">
+            <div>
+                <label for="groupName">Group Name:</label>
+                <input type="text" id="groupName" name="groupName" required>
+            </div>
+
+            <h3>Items to Add to the Group</h3>
+            <ul>
+                <% items.forEach(item => { %>
+                    <li>
+                        <input type="checkbox" name="selectedItems" value="<%= item._id %>" checked>
+                        <%= item.name %> (Quantity: <%= item.quantity %>, Barcode: <%= item.barcode %>)
+                    </li>
+                <% }) %>
+            </ul>
+
+            <button type="submit">Create Group</button>
+        </form>
+
+        <a href="/inventory">Back to Inventory</a>
+    </div>
+</body>
+</html>
