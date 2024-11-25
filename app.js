@@ -23,13 +23,26 @@ app.use(express.static('public'));
 app.get('/', async (req, res) => {
     try {
         const items = await Item.find();
-        const groups = await Group.find().populate('items'); // Populate items in groups
-        res.render('inventory', { items, groups });
+        res.render('inventory', { items});
     } catch (error) {
         console.error('Error fetching inventory:', error);
-        res.status(500).send('An error occurred.');
+        res.status(500).send('An error occurred. /');
     }
 });
+
+app.get('/groups', async (req, res) => {
+    // Fetch groups from the database
+    try {
+        const items = await Item.find();
+        const groups = await Group.find().populate('items');
+        res.render('groups', { groups });
+
+    } catch (error) {
+        console.error('Error fetching inventory:', error);
+        res.status(500).send('An error occurred. groups');
+    }
+
+  });
 
 
 // Add Inventory Page

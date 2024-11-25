@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     margin: 0;
     padding: 0;
     line-height: 1.6;
@@ -10,9 +12,16 @@ body {
 header {
     background: #F1F4F9;
     color: black;
-    padding: 10px 20px;
-    text-align: center;
+    display: flex;
+    align-items: center; /* Vertically aligns items */
+    gap: 10px; /* Adds space between the image and the heading */
+    padding: 10px; /* Optional: Adds some padding to the header */
+
 }
+
+img {
+    display:inline-block;
+   }
 
 main {
     padding: 20px;
@@ -117,7 +126,7 @@ form button:hover {
 
 
 /* Page layout */
-.container {
+.main-container {
     display: flex;
     min-height: 100vh;
 }
@@ -163,6 +172,10 @@ form button:hover {
 
 .inventory-section {
     margin-top: 20px;
+}
+
+.actions {
+    padding-top: 10px;
 }
 
 /* Action button styling */
