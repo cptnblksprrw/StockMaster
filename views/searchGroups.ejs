@@ -43,7 +43,7 @@
       <main class="main-content">
         <h2>Groups</h2>
 
-                <!-- 
+        <!-- 
         <div class="actions mb-4">
           <label for="groupActionSelect">Action:</label>
           <select id="groupActionSelect" name="action">
@@ -57,29 +57,29 @@
         Action Selection and Form -->
 
         <div class="main-header">
-          <div class="main-left">
-            <div class="actions">
-              <label for="actionSelect">Action:</label>
-              <select id="actionSelect" name="action">
-                <option value="">Select an Action</option>
-                <option value="createGroup">Create Group</option>
-                <option value="deleteSelected">Delete Selected</option>
-                <option value="printBarcode">Print Barcode</option>
-                <!-- Add more actions if needed -->
-              </select>
-              <button id="applyAction">Apply</button>
+            <div class="main-left">
+              <div class="actions">
+                <label for="actionSelect">Action:</label>
+                <select id="actionSelect" name="action">
+                  <option value="">Select an Action</option>
+                  <option value="createGroup">Create Group</option>
+                  <option value="deleteSelected">Delete Selected</option>
+                  <option value="printBarcode">Print Barcode</option>
+                  <!-- Add more actions if needed -->
+                </select>
+                <button id="applyAction">Apply</button>
+              </div>
             </div>
-          </div>
-          <div class="main-right">
-            <div class="search">
-              <form action="/searchGroups" method="GET">
-                <input type="text" name="query" placeholder="Search groups..." required>
-                <button type="submit">Search</button>
-              </form>
+            <div class="main-right">
+              <div class="search">
+                <form action="/searchItems" method="GET">
+                  <input type="text" name="query" placeholder="Search items..." required>
+                  <button type="submit">Search</button>
+                </form>
+              </div>
+  
             </div>
-
-          </div>
-         </div>
+           </div>
 
         <!-- Group Table -->
         <table class="table table-striped">
@@ -92,30 +92,25 @@
             </tr>
           </thead>
           <tbody>
-            <% if (groups && groups.length > 0) { %> <% groups.forEach(group =>
-            { %>
+            <% if (results.length > 0) { %> <% results.forEach(group => { %>
             <tr>
               <td>
                 <input
-                  type="checkbox"
-                  class="group-checkbox"
-                  name="selectedGroups"
-                  value="<%= group._id %>"
+                type="checkbox"
+                class="group-checkbox"
+                name="selectedGroups"
+                value="<%= group._id %>"
                 />
               </td>
               <td><%= group.name %></td>
               <td><%= group.items.length %></td>
-              <td>
-                <a href="/group/<%= group._id %>" >View Details</a
-                >
-              </td>
+              <td><a href="/group/<%= group._id %>">View Details</a></td>
             </tr>
-            <% }) %> <% } else { %>
-            <tr>
-              <td colspan="4">No groups available.</td>
-            </tr>
-            <% } %>
+            <% }) %>
           </tbody>
+          <% } else { %>
+          <p>No items found.</p>
+          <% } %>
         </table>
       </main>
     </div>

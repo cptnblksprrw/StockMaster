@@ -1,5 +1,3 @@
-
-
 // Select All Checkbox Functionality
 const selectAll = document.getElementById("select-all");
 const checkboxes = document.querySelectorAll(".item-checkbox");

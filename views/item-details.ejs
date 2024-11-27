@@ -13,10 +13,16 @@
     <main>
         <h2><%= item.name %></h2>
         <p><strong>Quantity:</strong> <%= item.quantity %></p>
+        <p><strong>Unit:</strong> <%= item.unit %></p>
         <p><strong>Category:</strong> <%= item.category %></p>
         <p><strong>Description:</strong> <%= item.description %></p>
         <p><strong>Barcode:</strong> <%= item.barcode %></p>
-        <a href="/" class="button">Back to Inventory</a>
+
+        <a href="/inventory" class="button">Back to Inventory</a>
+        <% if (item.image) { %>
+            <img src="<%= item.image %>" alt="<%= item.name %>" width="50" height="50">
+          <% } else { %>
+            <p>No image</p> <% } %>
     </main>
 </body>
 </html>

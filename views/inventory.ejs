@@ -9,19 +9,29 @@
   </head>
   <body>
     <header>
-      <img src="/img/logo.png">
-      <h1>StockMaster</h1>
-
-    </header>
+      <div class="header-left">
+          <img src="/img/logo.png" alt="Logo" />
+          <h1>StockMaster</h1>
+      </div>
+      <nav class="header-middle">
+          <a href="/home">Home</a>
+          <a href="/reports">Reports</a>
+          <a href="/support">Support</a>
+      </nav>
+      <div class="header-right">
+          <button class="barcode-button" id="openScanModal">Scan Barcode</button>
+          <button class="add-button" id="openAddModal">Add Inventory</button>
+      </div>
+  </header>
     <div class="main-container">
       <!-- Sidebar -->
       <aside class="sidebar">
         <nav>
           <ul>
-            <li><a href="/">Items</a></li>
+            <li><a href="/inventory">Inventory</a></li>
             <li><a href="/groups">Groups</a></li>
-            <li><a href="#" id="openAddModal">Add Inventory</a></li>
-            <li><a href="#" id="openScanModal">Scan Item</a></li>
+            <!--<li><a href="#" id="openAddModal">Add Inventory</a></li>
+            <li><a href="#" id="openScanModal">Scan Item</a></li>-->
             
           </ul>
         </nav>
@@ -30,87 +40,41 @@
       <!-- Main Content -->
       <main class="main-content">
         <h2>Inventory</h2>
-
-        <!-- Toggle Display Options -->
-        <div class="toggle-display">
-          <button class='btn btn-outline-secondary'id="showItems">Show Items</button>
-          <button class='btn btn-outline-secondary'id="showGroups">Show Groups</button>
-        </div>
-
         <!-- Action Selection and Form -->
-        <div class="actions">
-          <label for="actionSelect">Action:</label>
-          <select id="actionSelect" name="action">
-            <option value="">Select an Action</option>
-            <option value="createGroup">Create Group</option>
-            <option value="deleteSelected">Delete Selected</option>
-            <option value="printBarcode">Print Barcode</option>
-            <!-- Add more actions if needed -->
-          </select>
-          <button id="applyAction" class="btn btn-danger">Apply</button>
-        </div>
- 
-        <!-- Add Inventory Modal -->
-        <div id="addInventoryModal" class="modal">
-          <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <span id="closeAddModal" class="close">&times;</span>
-            <h2>Add Inventory</h2>
-            <form action="/add-item" method="POST">
-              <label for="name">Item Name:</label>
-              <input type="text" id="name" name="name" required />
-
-              <label for="quantity">Quantity:</label>
-              <input type="number" id="quantity" name="quantity" required />
-
-              <label for="category">Category:</label>
-              <input type="text" id="category" name="category" required />
-
-              <label for="description">Description:</label>
-              <textarea
-                id="description"
-                name="description"
-                rows="4"
-                required
-              ></textarea>
-
-              <button type="submit">Add Item</button>
-            </form>
+         <div class="main-header">
+          <div class="main-left">
+            <div class="actions">
+              <label for="actionSelect">Action:</label>
+              <select id="actionSelect" name="action">
+                <option value="">Select an Action</option>
+                <option value="createGroup">Create Group</option>
+                <option value="deleteSelected">Delete Selected</option>
+                <option value="printBarcode">Print Barcode</option>
+                <!-- Add more actions if needed -->
+              </select>
+              <button id="applyAction">Apply</button>
+            </div>
           </div>
-        </div>
-        </div>
+          <div class="main-right">
+            <div class="search">
+              <form action="/searchItems" method="GET">
+                <input type="text" name="query" placeholder="Search items..." required>
+                <button type="submit">Search</button>
+              </form>
+            </div>
 
-        <!-- Scan Item Modal -->
-        <div id="scanItemModal" class="modal">
-          <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <span id="closeScanModal" class="close">&times;</span>
-            <h2>Scan Item</h2>
-            <form id="scanForm" action="/scan-item" method="POST">
-              <label for="barcode">Scan Barcode:</label>
-              <input
-                type="text"
-                id="barcode"
-                name="barcode"
-                placeholder="Scan barcode here"
-                required
-                autofocus
-              />
-            </form>
           </div>
-        </div>
-        </div>
+         </div>
 
-        <!-- Item List -->
+                 <!-- Item List -->
         <div id="itemList" class="inventory-section">
-          <h3>Items</h3>
           <table>
             <thead>
               <tr>
                 <th><input type="checkbox" id="select-all" /></th>
                 <th>Item Name</th>
                 <th>Quantity</th>
-                <th>Barcode</th>
+                <th>Description</th>
                 <th>Details</th>
               </tr>
             </thead>
@@ -127,7 +91,7 @@
                 </td>
                 <td><%= item.name %></td>
                 <td><%= item.quantity %></td>
-                <td><%= item.barcode %></td>
+                <td><%= item.description %></td>
                 <td><a href="/item/<%= item._id %>">View Details</a></td>
               </tr>
               <% }) %>
@@ -135,7 +99,17 @@
           </table>
         </div>
 
-        <!-- Group List -->
+        <!-- Add Inventory Modal -->
+        <%- include('partials/add-inventory') %>
+
+
+        <!-- Scan Item Modal -->
+        <%- include('partials/scan-item') %>
+
+
+
+
+
 
       </main>
     </div>

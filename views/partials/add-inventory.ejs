@@ -1,0 +1,46 @@
+<div id="addInventoryModal" class="modal">
+  <div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <span id="closeAddModal" class="close">&times;</span>
+    <h2>Add Inventory</h2>
+    <form action="/add-item" method="POST">
+      <label for="name">Item Name:</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="manufacturer">Manufacturer:</label>
+      <input type="text" id="manufacturer" name="manufacturer" required />
+
+      <label for="colour">Colour:</label>
+      <input type="colour" id="colour" name="colour" />
+
+      <label for="style">Style:</label>
+      <input type="text" id="style" name="style"  />
+
+      <label for="quantity">Quantity:</label>
+      <input type="number" id="quantity" name="quantity" required />
+
+      <label for="unit">Unit:</label>
+      <input type="text" id="unit" name="unit"  />
+
+      <label for="category">Category:</label>
+      <input type="text" id="category" name="category" required />
+
+      
+
+      <label for="description">Description:</label>
+      <textarea
+        id="description"
+        name="description"
+        rows="4"
+        required
+      ></textarea>
+
+              <!-- Image Upload Field -->
+      <label for="image">Item Picture (Optional):</label>
+      <input type="file" id="image" name="image" accept="image/*" />
+
+      <button type="submit">Add Item</button>
+    </form>
+  </div>
+</div>
+</div>
