@@ -4,7 +4,10 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const Item = require("./models/Item");
-const Group = require("./models/group");
+const Group = require("./models/Group");
+const Template = require("./models/Template");
+const JsBarcode = require("jsbarcode"); 
+
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON bodies
@@ -20,34 +23,74 @@ mongoose
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/uploads", express.static("uploads"));
 
 // Set storage engine for multer
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Specify the folder where files will be stored
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Folder to store uploaded files
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); // Ensure the file gets a unique name
-  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
 });
 
 // Initialize multer with the storage engine
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-// Route
+// Routes
 
-app.get("/inventory", async (req, res) => {
+app.get('/', async (req, res) => {
   try {
+    const totalItems = await Item.countDocuments();
+    const templates = await Template.find();
     const items = await Item.find();
-    res.render("inventory", { items });
+    const groups = await Group.find().populate("items");
+    const totalValue = await Item.aggregate([
+      { $group: { _id: null, total: { $sum: "$price" } } }
+    ]);
+    const recentItems = await Item.find()
+            .sort({ createdAt: -1 }) // Sort by most recent first
+            .limit(15); // Limit to 50 items
+
+    const totalPrice = totalValue[0]?.total || 0; // Default to 0 if no items
+    res.render('overview', { recentItems, templates, groups, totalItems, totalPrice });
   } catch (error) {
-    console.error("Error fetching inventory:", error);
-    res.status(500).send("An error occurred. /");
+    console.error('Error fetching overview data:', error);
+    res.status(500).send('An error occurred while fetching overview data');
   }
 });
+
+
+app.get('/inventory', async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const limit = req.query.limit === 'unlimited' ? 0 : parseInt(req.query.limit) || 10; // Default to 10 items per page
+  const skip = (page - 1) * limit;
+
+  try {
+      const totalItems = await Item.countDocuments();
+      const items = limit === 0 ? await Item.find() : await Item.find().skip(skip).limit(limit);
+      const templates = await Template.find();
+
+      const totalPages = limit === 0 ? 1 : Math.ceil(totalItems / limit);
+
+      res.render('inventory', { 
+          items,
+          templates,
+          currentPage: page, 
+          totalPages, 
+          currentLimit: req.query.limit || '10' 
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Error loading inventory");
+  }
+});
+
 
 app.get("/groups", async (req, res) => {
   // Fetch groups from the database
@@ -70,6 +113,7 @@ app.get("/searchItems", async (req, res) => {
       $or: [
         { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive search
         { description: { $regex: searchQuery, $options: "i" } },
+        { category: { $regex: searchQuery, $options: "i" }}
       ],
     });
 
@@ -104,45 +148,135 @@ app.get("/add", (req, res) => {
 });
 
 // Save Item to Database
-app.post("/add-item", upload.single("image"), async (req, res) => {
+app.post("/create", upload.single('image'), async (req, res) => {
   const {
-    name,
     manufacturer,
     colour,
     style,
-    quantity,
-    unit,
+    measurement1,
+    unit1,
+    measurement2,
+    unit2,
     category,
     description,
+    price,
+    isTemplate,
   } = req.body;
-  const image = req.file ? req.file.path : null; // Handle optional image
-  console.log(req.file);
-  console.log(image);
-  try {
-    const timestamp = Date.now().toString(); // Timestamp as part of the barcode
-    const uniqueSuffix = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(3, "0"); // Random 3-digit number
-    const barcode = `I${timestamp}${uniqueSuffix}`; // Generate barcode
+  
 
-    const newItem = new Item({
-      name,
-      manufacturer,
-      colour,
-      style,
-      quantity,
-      unit,
-      category,
-      description,
-      barcode,
-      image,
-    });
-    await newItem.save(); // Save to database
+  const imagePath = req.file ? req.file.path : null;
+
+  console.log(req.body);
+  console.log(req.file);
+
+  try {
+    if (isTemplate) {
+      // Create a template
+      const template = new Template({
+        manufacturer,
+        colour,
+        style,
+        measurement1,
+        unit1,
+        measurement2,
+        unit2,
+        category,
+        description,
+        price,
+        image: imagePath,
+      });
+      await template.save();
+      console.log("Template created successfully:", template);
+    } else {
+      // Create an item
+      const barcode = `BC${Date.now()}`; // Generate a unique barcode
+      const item = new Item({
+        manufacturer,
+        colour,
+        style,
+        measurement1,
+        unit1,
+        measurement2,
+        unit2,
+        category,
+        description,
+        price,
+        barcode,
+        image: imagePath
+      });
+      await item.save();
+      console.log("Item created successfully:", item);
+    }
+
     res.redirect("/inventory");
-  } catch (err) {
-    res.status(500).send("Error saving item.");
+  } catch (error) {
+    console.error("Error creating item or template:", error);
+    res.status(500).send("An error occurred while processing your request.");
   }
 });
+
+app.post("/templates/:templateId/generate-items", async (req, res) => {
+  const { templateId } = req.params;
+  const { quantity } = req.body;
+
+  const template = await Template.findById(templateId);
+  if (!template) return res.status(404).send("Template not found");
+
+  for (let i = 0; i < quantity; i++) {
+    const barcode = `BC${Date.now()}${i}`; // Generate unique barcode
+
+    const item = new Item({
+      name: template.name,
+      manufacturer: template.manufacturer,
+      colour: template.colour,
+      style: template.style,
+      measurement1 : template.measurement1,
+      unit1 : template.unit1,
+      measurement2 : template.measurement2,
+      unit2 : template.unit2,
+      category: template.category,
+      description: template.description,
+      price: template.price,
+      barcode,
+    });
+
+    await item.save();
+  }
+
+  template.itemCount += parseInt(quantity, 10);
+  await template.save();
+
+  res.redirect("/inventory");
+});
+
+app.get('/template-details/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const template = await Template.findById(id);
+    if (!template) {
+      return res.status(404).send('Template not found');
+    }
+    res.render('template-details', { template });
+  } catch (error) {
+    console.error('Error fetching template details:', error);
+    res.status(500).send('An error occurred while fetching template details');
+  }
+});
+
+// Route to delete a group
+app.post("/delete-template/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const template = await Template.findByIdAndDelete(id);
+    if (!template) {
+      return res.status(404).send("Group not found");
+    }
+    res.redirect("/inventory"); // Redirect to the groups page after deletion
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+});
+
 
 app.get("/group/:id", async (req, res) => {
   try {
@@ -164,6 +298,20 @@ app.get("/item/:id", async (req, res) => {
     res.status(500).send("Error fetching item details.");
   }
 });
+
+app.post('/item/:id/availability', async (req, res) => {
+  const { id } = req.params;
+  const { availability } = req.body;
+
+  try {
+      await Item.findByIdAndUpdate(id, { availability });
+      res.redirect(`/item/${id}`);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Error updating availability");
+  }
+});
+
 
 // Scan Item Page
 app.get("/scan-item", (req, res) => {
@@ -192,12 +340,21 @@ app.get("/create-group", async (req, res) => {
   try {
     // Fetch the selected items from the database
     const items = await Item.find({ _id: { $in: selectedItemIds } });
-    res.render("create-group", { items }); // Render the group creation page, passing selected items
+
+    // Update availability of the selected items to "sold"
+    await Item.updateMany(
+      { _id: { $in: selectedItemIds } },
+      { $set: { availability: "sold" } }
+    );
+
+    // Render the group creation page, passing selected items
+    res.render("create-group", { items });
   } catch (err) {
-    console.error("Error fetching items:", err);
+    console.error("Error creating group:", err);
     res.status(500).send("Error creating group");
   }
 });
+
 
 // Route to handle creating a group (POST request)
 app.post("/create-group", async (req, res) => {
@@ -206,8 +363,8 @@ app.post("/create-group", async (req, res) => {
   try {
     const timestamp = Date.now().toString(); // Timestamp as part of the barcode
     const uniqueSuffix = Math.floor(Math.random() * 1000)
-    .toString()
-    .padStart(3, "0"); // Random 3-digit number
+      .toString()
+      .padStart(3, "0"); // Random 3-digit number
     const barcode = `G${timestamp}${uniqueSuffix}`; // Generate barcode
     // Create a new group in the database
     const newGroup = new Group({

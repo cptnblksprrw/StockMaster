@@ -1,46 +1,64 @@
 <div id="addInventoryModal" class="modal">
   <div class="modal-dialog modal-lg">
-  <div class="modal-content">
-    <span id="closeAddModal" class="close">&times;</span>
-    <h2>Add Inventory</h2>
-    <form action="/add-item" method="POST">
-      <label for="name">Item Name:</label>
-      <input type="text" id="name" name="name" required />
+    <div class="modal-content">
+      <span id="closeAddModal" class="close">&times;</span>
+      <h2>Add Inventory</h2>
+      <form action="/create" method="POST" enctype="multipart/form-data">
+        <!-- Template Checkbox -->
+        <label for="isTemplate">Save as Template</label>
+        <input type="checkbox" id="isTemplate" name="isTemplate" />
 
-      <label for="manufacturer">Manufacturer:</label>
-      <input type="text" id="manufacturer" name="manufacturer" required />
+        <!-- Manufacturer -->
+        <label for="manufacturer">Manufacturer: *</label>
+        <input type="text" id="manufacturer" name="manufacturer" required />
 
-      <label for="colour">Colour:</label>
-      <input type="colour" id="colour" name="colour" />
+        <!-- Colour -->
+        <label for="colour">Colour: *</label>
+        <input type="text" id="colour" name="colour" />
 
-      <label for="style">Style:</label>
-      <input type="text" id="style" name="style"  />
+        <!-- Style -->
+        <label for="style">Style: *</label>
+        <input type="text" id="style" name="style" />
 
-      <label for="quantity">Quantity:</label>
-      <input type="number" id="quantity" name="quantity" required />
+        <!-- Quantity -->
+        <label for="measurement1">Measurement 1: *</label>
+        <input type="number" step="0.01" id="measurement1" name="measurement1" required />
 
-      <label for="unit">Unit:</label>
-      <input type="text" id="unit" name="unit"  />
+        <!-- Unit -->
+        <label for="unit">Unit:</label>
+        <input type="text" id="unit1" name="unit1" />
 
-      <label for="category">Category:</label>
-      <input type="text" id="category" name="category" required />
+        <!-- Quantity -->
+        <label for="measurement2">Measurement 2:</label>
+        <input type="text" id="measurement2" name="measurement2" />
 
-      
+        <!-- Unit -->
+        <label for="unit2">Unit 2:</label>
+        <input type="text" id="unit2" name="unit2" />
 
-      <label for="description">Description:</label>
-      <textarea
-        id="description"
-        name="description"
-        rows="4"
-        required
-      ></textarea>
+        <!-- Category -->
+        <label for="category">Category: *</label>
+        <input type="text" id="category" name="category" required />
 
-              <!-- Image Upload Field -->
-      <label for="image">Item Picture (Optional):</label>
-      <input type="file" id="image" name="image" accept="image/*" />
+        <!-- Description -->
+        <label for="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          rows="4"
+        ></textarea>
 
-      <button type="submit">Add Item</button>
-    </form>
+        <!-- Price -->
+        <label for="price">Price: *</label>
+        <input type="number" step="0.01" id="price" name="price" required />
+
+        <!-- Image -->
+        <label for="image">Image:</label>
+        <input type="file" id="image" name="image" accept="image/*" />
+
+        <!-- Submit Button -->
+        <button type="submit">Submit</button>
+      </form>
+    </div>
   </div>
-</div>
 </div>

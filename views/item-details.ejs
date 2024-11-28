@@ -1,28 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Item Details</title>
-    <link rel="stylesheet" href="/styles/styles.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory</title>
+    <link rel="stylesheet" href="/styles/styles.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <header>
-        <h1>Item Details</h1>
+      <div class="header-left">
+        <img src="/img/logo.png" alt="Logo" />
+        <h1>StockMaster</h1>
+      </div>
+      <nav class="header-middle">
+        <a href="/">Home</a>
+        <a href="/reports">Reports</a>
+        <a href="/support">Support</a>
+      </nav>
+      <div class="header-right">
+        <button class="barcode-button" id="openScanModal">Scan Barcode</button>
+        <button class="add-button" id="openAddModal">Add Inventory</button>
+      </div>
     </header>
-    <main>
-        <h2><%= item.name %></h2>
-        <p><strong>Quantity:</strong> <%= item.quantity %></p>
-        <p><strong>Unit:</strong> <%= item.unit %></p>
-        <p><strong>Category:</strong> <%= item.category %></p>
-        <p><strong>Description:</strong> <%= item.description %></p>
-        <p><strong>Barcode:</strong> <%= item.barcode %></p>
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <nav>
+          <ul>
+            <li><a href="/inventory">Inventory</a></li>
+            <li><a href="/groups">Groups</a></li>
+            <!--<li><a href="#" id="openAddModal">Add Inventory</a></li>
+            <li><a href="#" id="openScanModal">Scan Item</a></li>-->
+          </ul>
+        </nav>
+      </aside>
+
+      <div class="details-container">
+        <!-- Top Section: Name and Image -->
+        <div class="name-and-image">
+          <div class="name">
+            <h2><%= item.name %></h2>
+            <canvas id="barcode-<%= item._id %>"></canvas>
+            <button class="barcode-button" id="printBarcodeBtn">
+              Print Barcode
+            </button>
+          </div>
+          <div class="image">
+            <% if (item.image) { %>
+            <img
+              src="/<%= item.image %>"
+              alt="<%= item.name %>"
+              class="item-image"
+            />
+            <% } else { %>
+            <p>No image</p>
+            <% } %>
+          </div>
+        </div>
+
+        <!-- Bottom Section: Details and Description -->
+        <div class="details-description">
+          <!-- Left Column: Item details -->
+          <div class="details-left">
+            <p><strong>Measurement:</strong> <%= item.measurement1 %></p>
+            <p><strong>Unit:</strong> <%= item.unit1 %></p>
+            <p><strong>Category:</strong> <%= item.category %></p>
+            <p><strong>Price : $</strong> <%= item.price %></p>
+          </div>
+
+          <!-- Right Column: Description -->
+          <div class="details-right">
+            <p><strong>Description:</strong></p>
+            <p><%= item.description %></p>
+          </div>
+        </div>
+        <form method="POST" action="/item/<%= item._id %>/availability">
+          <label for="availability">Availability:</label>
+          <select name="availability" id="availability">
+            <option value="in stock" <%= item.availability === 'in stock' ? 'selected' : '' %>>In Stock</option>
+            <option value="sold" <%= item.availability === 'sold' ? 'selected' : '' %>>Sold</option>
+            
+          </select>
+          <button type="submit">Save</button>
+      </form>
+      
 
         <a href="/inventory" class="button">Back to Inventory</a>
-        <% if (item.image) { %>
-            <img src="<%= item.image %>" alt="<%= item.name %>" width="50" height="50">
-          <% } else { %>
-            <p>No image</p> <% } %>
-    </main>
-</body>
+      </div>
+    </div>
+
+    <!-- Add Inventory Modal -->
+    <%- include('partials/add-inventory') %>
+
+    <!-- Scan Item Modal -->
+    <%- include('partials/scan-item') %>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        JsBarcode("#barcode-<%= item._id %>", "<%= item.barcode %>", {
+          format: "CODE128", // You can use other formats like EAN13, UPC, etc.
+          lineColor: "#000",
+          width: 2,
+          height: 50,
+          displayValue: true, // Show the text below the barcode
+        });
+      });
+
+      const printBtn = document.getElementById("printBarcodeBtn");
+      printBtn.addEventListener("click", function () {
+        sendToPrinter("<%= item.barcode %>");
+      });
+    </script>
+    <script src="/js/details-handlers.js"></script>
+    <script src="https://qajavascriptsdktests.azurewebsites.net/JavaScript/dymo.connect.framework.js"></script>
+  </body>
 </html>

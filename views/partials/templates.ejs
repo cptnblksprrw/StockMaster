@@ -1,0 +1,39 @@
+<div class="template-list">
+    <h2>Products</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Item Count</th>
+          <th>Generate Items</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% templates.forEach(template => { %>
+          <tr>
+            <td><%= template.name %></td>
+            <td><%= template.itemCount %></td>
+            <td>
+              <form action="/templates/<%= template._id %>/generate-items" method="POST">
+                <label for="quantity-<%= template._id %>">Quantity:</label>
+                <input 
+                  type="number" 
+                  id="quantity-<%= template._id %>" 
+                  name="quantity" 
+                  min="1" 
+                  required
+                >
+                <button type="submit">Generate</button>
+              </form>
+            </td>
+            <td>
+              <a href="/template-details/<%= template._id %>">Details</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  
+  

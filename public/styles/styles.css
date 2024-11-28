@@ -22,7 +22,14 @@ header {
 .header-left {
     display: flex;
     align-items: center;
+
     gap: 10px; /* Space between the logo and title */
+}
+
+.header-left h1{
+    font-weight: bold; /* Makes the font bold */
+    font-size: 28px;   /* Sets the font size to 12px */
+    margin: auto;
 }
 
 .header-middle {
@@ -143,6 +150,9 @@ header {
     background-color: #0056b3; /* Darker blue on hover */
 }
 
+.details {
+    padding: 15px;
+}
 
 img {
     display:inline-block;
@@ -213,6 +223,45 @@ form button:hover {
     background: #0056b3;
 }
 
+.overview-container {
+    max-width: fit-content;
+    margin-left: 10px;
+    margin-right: 10px;
+    text-align: center;
+    padding-top: 15px;
+    display: grid;
+    grid-template-columns: 50% 50%;
+
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+
+}
+
+.stats {
+    gap: 20px; /* Space between cards */
+    margin-top: 20px;
+  }
+  
+  .card {
+    background-color: #ffffff;
+    border: 2px solid #28A745;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px 40px;
+    text-align: center;
+  }
+  
+  .card h2 {
+    font-size: 1.5rem;
+    color: #28A745;
+  }
+  
+  .card p {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+  }
 
 
 /* Modal container (hidden by default) */
@@ -317,3 +366,109 @@ select, button {
     margin: 10px;
     padding: 5px;
 }
+
+canvas {
+    margin: 10px 0;
+    display: block;
+  }
+
+  /* Container for the entire page */
+.details-container {
+    padding: 40px;  /* Increase padding to give more space inside the container */
+   
+    
+  }
+  
+  /* Top Section: Name and Image */
+  .name-and-image {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .name {
+    flex: 1;
+  }
+  
+  .image {
+    flex: 0;
+    margin-left: 20px;
+  }
+  
+  .item-image {
+    border: 2px solid #ccc; /* Border around the image */
+    padding: 5px;
+    max-width: 250px; /* Adjust size if needed */
+    height: auto;
+  }
+  
+  /* Bottom Section: Details and Description */
+  .details-description {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .details-left {
+    width: 60%; /* Left side takes most of the space */
+  }
+  
+  .details-right {
+    width: 35%; /* Right side takes less space */
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .details-left p {
+    margin: 10px 0;
+  }
+  
+  .details-right p {
+    margin: 10px 0;
+  }
+  
+  .badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+  }
+  
+  .badge-green {
+    background-color: #28a745; /* Green */
+  }
+  
+  .badge-red {
+    background-color: #dc3545; /* Red */
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagination a {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #007bff;
+  }
+  
+  .pagination a.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .pagination a:hover {
+    background-color: #e9ecef;
+  }
+  
+  

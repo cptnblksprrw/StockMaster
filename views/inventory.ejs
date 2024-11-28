@@ -5,34 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Inventory</title>
     <link rel="stylesheet" href="/styles/styles.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <header>
       <div class="header-left">
-          <img src="/img/logo.png" alt="Logo" />
-          <h1>StockMaster</h1>
+        <img src="/img/logo.png" alt="Logo" />
+        <h1>StockMaster</h1>
       </div>
       <nav class="header-middle">
-          <a href="/home">Home</a>
-          <a href="/reports">Reports</a>
-          <a href="/support">Support</a>
+        <a href="/">Home</a>
+        <a href="/reports">Reports</a>
+        <a href="/support">Support</a>
       </nav>
       <div class="header-right">
-          <button class="barcode-button" id="openScanModal">Scan Barcode</button>
-          <button class="add-button" id="openAddModal">Add Inventory</button>
+        <button class="barcode-button" id="openScanModal">Scan Barcode</button>
+        <button class="add-button" id="openAddModal">Add Inventory</button>
       </div>
-  </header>
+    </header>
     <div class="main-container">
       <!-- Sidebar -->
       <aside class="sidebar">
         <nav>
           <ul>
             <li><a href="/inventory">Inventory</a></li>
-            <li><a href="/groups">Groups</a></li>
+            <li><a href="/groups">Orders</a></li>
             <!--<li><a href="#" id="openAddModal">Add Inventory</a></li>
             <li><a href="#" id="openScanModal">Scan Item</a></li>-->
-            
           </ul>
         </nav>
       </aside>
@@ -41,13 +43,13 @@
       <main class="main-content">
         <h2>Inventory</h2>
         <!-- Action Selection and Form -->
-         <div class="main-header">
+        <div class="main-header">
           <div class="main-left">
             <div class="actions">
               <label for="actionSelect">Action:</label>
               <select id="actionSelect" name="action">
                 <option value="">Select an Action</option>
-                <option value="createGroup">Create Group</option>
+                <option value="createGroup">Create Order</option>
                 <option value="deleteSelected">Delete Selected</option>
                 <option value="printBarcode">Print Barcode</option>
                 <!-- Add more actions if needed -->
@@ -56,25 +58,41 @@
             </div>
           </div>
           <div class="main-right">
+            
+            
             <div class="search">
               <form action="/searchItems" method="GET">
-                <input type="text" name="query" placeholder="Search items..." required>
+                <input
+                  type="text"
+                  name="query"
+                  placeholder="Search items..."
+                  required
+                />
                 <button type="submit">Search</button>
               </form>
             </div>
-
           </div>
-         </div>
+        </div>
 
-                 <!-- Item List -->
+        <!-- Item List -->
         <div id="itemList" class="inventory-section">
+          <form id="limitForm" method="get" action="/inventory">
+              <label for="limit">Items per page:</label>
+              <select name="limit" id="limit" onchange="document.getElementById('limitForm').submit()">
+                <option value="10" <%= currentLimit === '10' ? 'selected' : '' %>>10</option>
+                <option value="25" <%= currentLimit === '25' ? 'selected' : '' %>>25</option>
+                <option value="50" <%= currentLimit === '50' ? 'selected' : '' %>>50</option>
+                <option value="unlimited" <%= currentLimit === 'unlimited' ? 'selected' : '' %>>Unlimited</option>
+              </select>
+              <input type="hidden" name="page" value="<%= currentPage %>">
+            </form>
           <table>
             <thead>
               <tr>
                 <th><input type="checkbox" id="select-all" /></th>
                 <th>Item Name</th>
-                <th>Quantity</th>
-                <th>Description</th>
+                <th>Category</th>
+                <th>Availability</th>
                 <th>Details</th>
               </tr>
             </thead>
@@ -90,27 +108,43 @@
                   />
                 </td>
                 <td><%= item.name %></td>
-                <td><%= item.quantity %></td>
-                <td><%= item.description %></td>
+                <td><%= item.category %></td>
+                <td>
+                  <span class="badge <%= item.availability === 'in stock' ? 'badge-green' : 'badge-red' %>">
+                      <%= item.availability %>
+                    </span>
+                </td>
                 <td><a href="/item/<%= item._id %>">View Details</a></td>
               </tr>
               <% }) %>
             </tbody>
           </table>
         </div>
+        <div class="pagination">
+          <% if (currentPage > 1) { %>
+          <a href="/inventory?page=<%= currentPage - 1 %>" class="pagination-prev">Previous</a>
+          <% } %>
+        
+          <% for (let i = 1; i <= totalPages; i++) { %>
+          <a href="/inventory?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>">
+            <%= i %>
+          </a>
+          <% } %>
+        
+          <% if (currentPage < totalPages) { %>
+          <a href="/inventory?page=<%= currentPage + 1 %>" class="pagination-next">Next</a>
+          <% } %>
+        </div>
+
+        
+        <!-- Template List-->
+        <%- include('partials/templates.ejs') %>
 
         <!-- Add Inventory Modal -->
         <%- include('partials/add-inventory') %>
 
-
         <!-- Scan Item Modal -->
         <%- include('partials/scan-item') %>
-
-
-
-
-
-
       </main>
     </div>
     <script src="js/inventory-handlers.js"></script>

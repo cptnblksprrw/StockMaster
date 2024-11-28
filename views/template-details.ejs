@@ -1,0 +1,40 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details</title>
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Item Details</h1>
+    </header>
+    <main>
+      <div class="template-details">
+        <h2>Template Details</h2>
+        <p><strong>Name:</strong> <%= template.name %></p>
+        <p><strong>Manufacturer:</strong> <%= template.manufacturer %></p>
+        <p><strong>Category:</strong> <%= template.category %></p>
+        <p><strong>Description:</strong> <%= template.description %></p>
+        <p><strong>Item Count:</strong> <%= template.itemCount %></p>
+        <p><strong>Price:</strong> $<%= template.price.toFixed(2) %></p>
+        <p><strong>Style:</strong> <%= template.style || 'N/A' %></p>
+        <p><strong>Colour:</strong> <%= template.colour || 'N/A' %></p>
+        <a href="/inventory">Back to Templates</a>
+      </div>
+
+      <form action="/delete-template/<%= template._id %>" method="POST">
+        <button
+          type="submit"
+          onclick="return confirm('Are you sure you want to delete this template? This will not delete the items.')"
+        >
+          Delete Template
+        </button>
+      </form>
+
+    </main>
+</body>
+</html>

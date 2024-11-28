@@ -1,0 +1,38 @@
+<div id="itemList" class="inventory-section">
+    <h2>Items</h2>
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="select-all" /></th>
+          <th>Item Name</th>
+          <th>Category</th>
+          <th>Availability</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %>
+        <tr>
+          <td>
+            <input
+              type="checkbox"
+              class="item-checkbox"
+              name="selectedItems"
+              value="<%= item._id %>"
+            />
+          </td>
+          <td><%= item.name %></td>
+          <td><%= item.category %></td>
+          <td>
+            <span class="badge <%= item.availability === 'in stock' ? 'badge-green' : 'badge-red' %>">
+                <%= item.availability %>
+              </span>
+          </td>
+          <td><a href="/item/<%= item._id %>">View Details</a></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  
