@@ -1,1 +1,1 @@
-# Warehouse-Inventory-Management
+# StockMaster
