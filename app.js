@@ -6,13 +6,57 @@ const path = require("path");
 const Item = require("./models/Item");
 const Group = require("./models/Group");
 const Template = require("./models/Template");
-const JsBarcode = require("jsbarcode"); 
-
-
+const JsBarcode = require("jsbarcode");
 const app = express();
+const { ObjectId } = require('mongodb');
+
+
 app.use(express.json()); // Middleware to parse JSON bodies
 
-// Connect to MongoDB
+require('dotenv').config();
+const dbConfig = {
+  cluster: process.env.DB_CLUSTER,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+};
+
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+const options = {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+  connectTimeoutMS: 30000,  // 30 seconds connection timeout
+  serverSelectionTimeoutMS: 30000,  // 30 seconds server selection timeout
+};
+
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/?retryWrites=true&w=majority&appName=${process.env.DB_NAME}`;
+
+
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// Create a MongoClient with the uri and options
+const client = new MongoClient(uri, options);
+
+async function run() {
+  try {
+    // Connect the client to the server
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+
+run().catch(console.dir);
+
+/* // Connect to MongoDB
 mongoose
   .connect("mongodb://localhost:27017/warehouse", {
     useNewUrlParser: true,
@@ -20,7 +64,7 @@ mongoose
   })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Could not connect to MongoDB:", err));
-
+*/
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
@@ -46,16 +90,19 @@ const upload = multer({ storage });
 
 app.get('/', async (req, res) => {
   try {
-    const totalItems = await Item.countDocuments();
-    const templates = await Template.find();
-    const items = await Item.find();
-    const groups = await Group.find().populate("items");
-    const totalValue = await Item.aggregate([
+    const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    const db = client.db(process.env.DB_NAME);
+
+    const totalItems = await db.collection('items').countDocuments();
+    const templates = await db.collection('templates').find().toArray();
+    const items = await db.collection('items').find().toArray();
+    const groups = await db.collection('groups').find().toArray();
+    const totalValue = db.collection('items').aggregate([
       { $group: { _id: null, total: { $sum: "$price" } } }
     ]);
-    const recentItems = await Item.find()
-            .sort({ createdAt: -1 }) // Sort by most recent first
-            .limit(15); // Limit to 50 items
+    const recentItems = db.collection('items').find()
+      .sort({ createdAt: -1 }) // Sort by most recent first
+      .limit(15); // Limit to 50 items
 
     const totalPrice = totalValue[0]?.total || 0; // Default to 0 if no items
     res.render('overview', { recentItems, templates, groups, totalItems, totalPrice });
@@ -65,29 +112,33 @@ app.get('/', async (req, res) => {
   }
 });
 
-
 app.get('/inventory', async (req, res) => {
+  const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  const db = client.db(process.env.DB_NAME);
+
+
   const page = parseInt(req.query.page) || 1; // Default to page 1
   const limit = req.query.limit === 'unlimited' ? 0 : parseInt(req.query.limit) || 10; // Default to 10 items per page
   const skip = (page - 1) * limit;
 
   try {
-      const totalItems = await Item.countDocuments();
-      const items = limit === 0 ? await Item.find() : await Item.find().skip(skip).limit(limit);
-      const templates = await Template.find();
 
-      const totalPages = limit === 0 ? 1 : Math.ceil(totalItems / limit);
+    const totalItems = await db.collection('items').countDocuments();
+    const templates = await db.collection('templates').find().toArray();
+    const items = await db.collection('items').find().toArray();
 
-      res.render('inventory', { 
-          items,
-          templates,
-          currentPage: page, 
-          totalPages, 
-          currentLimit: req.query.limit || '10' 
-      });
+    const totalPages = limit === 0 ? 1 : Math.ceil(totalItems / limit);
+
+    res.render('inventory', {
+      items,
+      templates,
+      currentPage: page,
+      totalPages,
+      currentLimit: req.query.limit || '10'
+    });
   } catch (error) {
-      console.error(error);
-      res.status(500).send("Error loading inventory");
+    console.error(error);
+    res.status(500).send("Error loading inventory");
   }
 });
 
@@ -113,7 +164,7 @@ app.get("/searchItems", async (req, res) => {
       $or: [
         { name: { $regex: searchQuery, $options: "i" } }, // Case-insensitive search
         { description: { $regex: searchQuery, $options: "i" } },
-        { category: { $regex: searchQuery, $options: "i" }}
+        { category: { $regex: searchQuery, $options: "i" } }
       ],
     });
 
@@ -162,7 +213,7 @@ app.post("/create", upload.single('image'), async (req, res) => {
     price,
     isTemplate,
   } = req.body;
-  
+
 
   const imagePath = req.file ? req.file.path : null;
 
@@ -170,12 +221,15 @@ app.post("/create", upload.single('image'), async (req, res) => {
   console.log(req.file);
 
   try {
+    const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    const db = client.db(process.env.DB_NAME);
+
     if (isTemplate) {
       // Create a template
       const template = new Template({
         manufacturer,
         colour,
-        style,
+        style, 
         measurement1,
         unit1,
         measurement2,
@@ -185,8 +239,17 @@ app.post("/create", upload.single('image'), async (req, res) => {
         price,
         image: imagePath,
       });
-      await template.save();
-      console.log("Template created successfully:", template);
+      const result = await db.collection('templates').insertOne(template);
+
+      if (result.acknowledged) {
+        console.log('Template successfully inserted');
+      } else {
+        console.log('template insertion failed');
+        res.status(500).send('Failed to add templat3e');
+      }
+
+      await client.close();
+      
     } else {
       // Create an item
       const barcode = `BC${Date.now()}`; // Generate a unique barcode
@@ -204,8 +267,17 @@ app.post("/create", upload.single('image'), async (req, res) => {
         barcode,
         image: imagePath
       });
-      await item.save();
-      console.log("Item created successfully:", item);
+      const result = await db.collection('items').insertOne(item);
+
+      if (result.acknowledged) {
+        console.log('Item successfully inserted');
+      } else {
+        console.log('Item insertion failed');
+        res.status(500).send('Failed to add item');
+      }
+
+      // Close the connection
+      await client.close();
     }
 
     res.redirect("/inventory");
@@ -230,10 +302,10 @@ app.post("/templates/:templateId/generate-items", async (req, res) => {
       manufacturer: template.manufacturer,
       colour: template.colour,
       style: template.style,
-      measurement1 : template.measurement1,
-      unit1 : template.unit1,
-      measurement2 : template.measurement2,
-      unit2 : template.unit2,
+      measurement1: template.measurement1,
+      unit1: template.unit1,
+      measurement2: template.measurement2,
+      unit2: template.unit2,
       category: template.category,
       description: template.description,
       price: template.price,
@@ -291,7 +363,20 @@ app.get("/group/:id", async (req, res) => {
 // Item Details Page
 app.get("/item/:id", async (req, res) => {
   try {
-    const item = await Item.findById(req.params.id);
+
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+    const db = client.db(process.env.DB_NAME);
+
+    console.log(req.params.id);
+
+    const itemId = new ObjectId(req.params.id);
+    console.log(itemId)
+
+    // Fetch the item by ID using the native driver
+    const item = await db.collection('items').findOne({ _id: itemId });
+
+
     if (!item) return res.status(404).send("Item not found.");
     res.render("item-details", { item });
   } catch (err) {
@@ -304,11 +389,11 @@ app.post('/item/:id/availability', async (req, res) => {
   const { availability } = req.body;
 
   try {
-      await Item.findByIdAndUpdate(id, { availability });
-      res.redirect(`/item/${id}`);
+    await Item.findByIdAndUpdate(id, { availability });
+    res.redirect(`/item/${id}`);
   } catch (error) {
-      console.error(error);
-      res.status(500).send("Error updating availability");
+    console.error(error);
+    res.status(500).send("Error updating availability");
   }
 });
 
@@ -321,6 +406,7 @@ app.get("/scan-item", (req, res) => {
 // Handle Barcode Scan Submission
 app.post("/scan-item", async (req, res) => {
   const { barcode } = req.body;
+   
   try {
     const item = await Item.findOne({ barcode });
     if (!item) {
@@ -467,7 +553,7 @@ app.post("/inventory/barcodes", async (req, res) => {
 });
 
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
